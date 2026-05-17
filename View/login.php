@@ -8,7 +8,7 @@ $email = $_SESSION["email"] ?? "";
 $isLoggedIn = $_SESSION["isLoggedIn"] ?? false;
 
 if ($isLoggedIn) {
-    Header("Location: auctionList.php");
+    Header("Location: dashboard.php");
     exit();
 }
 
