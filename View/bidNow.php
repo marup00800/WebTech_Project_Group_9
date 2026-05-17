@@ -2,7 +2,6 @@
 include "../Model/db.php";
 include "../Model/AuctionModel.php";
 include "../Model/BidModel.php";
-include "../Model/ResultModel.php";
 session_start();
 
 $isLoggedIn = $_SESSION["isLoggedIn"] ?? false;
