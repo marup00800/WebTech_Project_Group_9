@@ -22,6 +22,12 @@ if (!$listing_id || !$amount) {
     exit();
 }
 
+$db = new db();
+$connection = $db->openConnection();
+$bidModel = new BidModel();
+$resultModel = new ResultModel();
+
+$listingResult = $bidModel->getListingWithSellerById($connection, "listings", $listing_id);
 
 
 if ($listingResult->num_rows == 0) {
@@ -53,4 +59,14 @@ if ($amount <= $listing["current_bid"]) {
 
 $bidResult = $bidModel->placeBid($connection, "bids", $listing_id, $buyer_id, $amount);
 
+if ($bidResult) {
+    $bidModel->updateCurrentBid($connection, "listings", $listing_id, $amount);
+    $bidCountResult = $bidModel->getBidCountByListing($connection, "bids", $listing_id);
+    $bidCountRow = $bidCountResult->fetch_assoc();
+    $bid_count = $bidCountRow["bid_count"];
+
+    echo json_encode(["ok" => true, "new_bid" => $amount, "bid_count" => $bid_count]);
+} else {
+    echo json_encode(["ok" => false, "error" => "Failed to place bid. Please try again."]);
+}
 ?>
