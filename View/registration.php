@@ -32,6 +32,7 @@ unset($_SESSION["bio"]);
     <title>Register</title>
     <script src="../Controller/JS/checkEmail.js"></script>
     <script src="../Controller/JS/checkUsername.js"></script>
+    <script src="../Controller/JS/checkPassword.js"></script>
 </head>
 <body>
     <h2>Register</h2>
@@ -62,9 +63,11 @@ unset($_SESSION["bio"]);
             </tr>
             <tr>
                 <td>Password</td>
-                <td><input type="password" name="password" placeholder="Enter password (min 8 chars)"/></td>
-                <td><p style='color:red;'><?php echo $passwordError; ?></p></td>
-            </tr>
+                <td><input type="password" name="password" id="password" placeholder="Enter password (min 8 chars)" onkeyup="checkPassword()"/></td>
+                <td>
+                    <p style='color:red;'><?php echo $passwordError; ?></p>
+                    <p id="passwordCheckResponse"></p>
+                </td>
             <tr>
                 <td></td>
                 <td>Already have an account? <a href='login.php'>Login</a> Here</td>
