@@ -32,8 +32,6 @@ $hasStartingPriceError = false;
 $hasEndDatetimeError = false;
 $hasImageError = false;
 
-
-
 if (!$title) {
     $_SESSION["titleErr"] = "Title is required";
     $hasTitleError = true;
