@@ -19,19 +19,6 @@ $db = new db();
 $connection = $db->openConnection();
 $resultModel = new ResultModel();
 
-$expiredListings = $resultModel->getExpiredActiveListings($connection, "listings");
-if ($expiredListings->num_rows > 0) {
-    while ($expiredRow = $expiredListings->fetch_assoc()) {
-        $expiredId = $expiredRow["id"];
-        $highestBidResult = $resultModel->getHighestBidByListing($connection, "bids", $expiredId);
-        if ($highestBidResult->num_rows > 0) {
-            $highestBidRow = $highestBidResult->fetch_assoc();
-            $resultModel->closeAuction($connection, "listings", $expiredId, $highestBidRow["id"]);
-        } else {
-            $resultModel->closeAuctionNoWinner($connection, "listings", $expiredId);
-        }
-    }
-}
 
 $auctionModel = new AuctionModel();
 
@@ -43,21 +30,8 @@ unset($_SESSION["auctionErr"]);
 $listings = null;
 $endedListings = null;
 
-if ($seller_verified == 1) {
-    $listings = $auctionModel->getListingsBySeller($connection, "listings", $user_id);
-    $endedListings = $resultModel->getEndedListingsBySeller($connection, "listings", $user_id);
-}
 
-$adminStats = null;
-$topCategories = [];
-if ($role == "admin") {
-    $statsResult = $resultModel->getAdminStats($connection);
-    $adminStats = $statsResult->fetch_assoc();
-    $categoriesResult = $resultModel->getTop5CategoriesByEndedAuctions($connection);
-    while ($row = $categoriesResult->fetch_assoc()) {
-        $topCategories[] = $row;
-    }
-}
+
 ?>
 <html>
 <head>
@@ -82,18 +56,13 @@ if ($role == "admin") {
                 <th>Highest Sale</th>
             </tr>
             <tr>
-                <td><?php echo $adminStats["total_active"]; ?></td>
-                <td><?php echo $adminStats["total_ended"]; ?></td>
-                <td><?php echo $adminStats["total_bids"]; ?></td>
-                <td><?php echo $adminStats["highest_sale"]; ?></td>
+                
             </tr>
         </table>
 
         <h3>Top 5 Categories by Completed Auctions</h3>
         <canvas id="categoryChart" width="600" height="300"></canvas>
         <script>
-            var labels = <?php echo json_encode(array_column($topCategories, "category_name")); ?>;
-            var data = <?php echo json_encode(array_column($topCategories, "total")); ?>;
             var ctx = document.getElementById("categoryChart").getContext("2d");
             new Chart(ctx, {
                 type: "bar",
