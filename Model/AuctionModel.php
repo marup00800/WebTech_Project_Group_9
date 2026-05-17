@@ -1,17 +1,9 @@
 <?php
 
+include "../Model/db.php";
+
+include "../Model/AuctionModel.php";
+
+session_start();
+
 ?>
-
-<html>
-
-<head>
-
-    <title>Auction List</title>
-
-</head>
-
-<body>
-
-</body>
-
-</html>
