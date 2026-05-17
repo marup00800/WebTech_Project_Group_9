@@ -2,6 +2,7 @@
 include "../Model/db.php";
 include "../Model/AuctionModel.php";
 include "../Model/BidModel.php";
+include "../Model/ResultModel.php";
 session_start();
 
 $isLoggedIn = $_SESSION["isLoggedIn"] ?? false;
@@ -35,6 +36,9 @@ if ($listingResult->num_rows == 0) {
 }
 
 $listing = $listingResult->fetch_assoc();
+$bidsResult = $bidModel->getLastTenBids($connection, "bids", $listing_id);
+
+$myBidsResult = $bidModel->getMyBids($connection, "bids", $user_id);
 ?>
 <html>
 <head>
@@ -72,7 +76,22 @@ $listing = $listingResult->fetch_assoc();
             <th>Amount</th>
             <th>Time</th>
         </tr>
-       
+        <?php
+        if ($bidsResult->num_rows > 0) {
+            while ($row = $bidsResult->fetch_assoc()) {
+                $bidder_name = $row["bidder_name"];
+                $amount = $row["amount"];
+                $created_at = $row["created_at"];
+                echo "<tr>
+                    <td>$bidder_name</td>
+                    <td>$amount</td>
+                    <td>$created_at</td>
+                </tr>";
+            }
+        } else {
+            echo "<tr><td colspan='3'>No bids yet.</td></tr>";
+        }
+        ?>
     </table>
 
     <h3>My Bids</h3>
@@ -84,9 +103,44 @@ $listing = $listingResult->fetch_assoc();
             <th>Status</th>
         </tr>
         <?php
-    
-               
-        
+        if ($myBidsResult->num_rows > 0) {
+            while ($row = $myBidsResult->fetch_assoc()) {
+                $listing_title = $row["title"];
+                $my_highest_bid = $row["my_highest_bid"];
+                $current_bid = $row["current_bid"];
+                $status = $row["status"];
+                $winner_bid_id = $row["winner_bid_id"];
+                $bid_id = $row["bid_id"];
+                $reserve_price = $row["reserve_price"];
+
+                if ($status == "active") {
+                    if ($my_highest_bid == $current_bid) {
+                        $badge = "<span style='color:green;'>Leading</span>";
+                    } else {
+                        $badge = "<span style='color:orange;'>Outbid</span>";
+                    }
+                } else if ($status == "ended") {
+                    if ($winner_bid_id == $bid_id && $current_bid >= $reserve_price) {
+                        $badge = "<span style='color:green;'>🏆 You Won!</span>";
+                    } else if ($current_bid < $reserve_price) {
+                        $badge = "<span style='color:red;'>Reserve Not Met</span>";
+                    } else {
+                        $badge = "<span style='color:red;'>Lost</span>";
+                    }
+                } else {
+                    $badge = "<span>$status</span>";
+                }
+
+                echo "<tr>
+                    <td>$listing_title</td>
+                    <td>$my_highest_bid</td>
+                    <td>$current_bid</td>
+                    <td>$badge</td>
+                </tr>";
+            }
+        } else {
+            echo "<tr><td colspan='4'>You have not placed any bids yet.</td></tr>";
+        }
         ?>
     </table>
 
