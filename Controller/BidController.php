@@ -1,7 +1,6 @@
 <?php
 include "../Model/db.php";
 include "../Model/BidModel.php";
-include "../Model/ResultModel.php";
 session_start();
 
 header("Content-Type: application/json");
@@ -27,8 +26,8 @@ $connection = $db->openConnection();
 $bidModel = new BidModel();
 $resultModel = new ResultModel();
 
-$listingResult = $bidModel->getListingWithSellerById($connection, "listings", $listing_id);
 
+$listingResult = $bidModel->getListingCurrentBid($connection, "listings", $listing_id);
 
 if ($listingResult->num_rows == 0) {
     echo json_encode(["ok" => false, "error" => "Listing not found."]);
