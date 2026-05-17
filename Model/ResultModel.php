@@ -16,5 +16,15 @@ class ResultModel {
         return $result;
     }
 
+    function closeAuction($connection, $tableName, $listing_id, $winner_bid_id) {
+        $sql = "UPDATE $tableName SET status = 'ended', winner_bid_id = ? WHERE id = ?";
+        $statement = $connection->prepare($sql);
+        $statement->bind_param("ii", $winner_bid_id, $listing_id);
+        $statement->execute();
+        $result = $statement->affected_rows;
+        return $result;
+    }
+
+
 }
 ?>
