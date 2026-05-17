@@ -31,3 +31,29 @@ $hasCategoryError = false;
 $hasStartingPriceError = false;
 $hasEndDatetimeError = false;
 $hasImageError = false;
+
+
+
+if (!$title) {
+    $_SESSION["titleErr"] = "Title is required";
+    $hasTitleError = true;
+} else {
+    unset($_SESSION["titleErr"]);
+    $hasTitleError = false;
+}
+
+if (!$description) {
+    $_SESSION["descriptionErr"] = "Description is required";
+    $hasDescriptionError = true;
+} else {
+    unset($_SESSION["descriptionErr"]);
+    $hasDescriptionError = false;
+}
+
+if (!$category_id) {
+    $_SESSION["categoryErr"] = "Category is required";
+    $hasCategoryError = true;
+} else {
+    unset($_SESSION["categoryErr"]);
+    $hasCategoryError = false;
+}
