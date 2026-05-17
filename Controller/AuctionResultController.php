@@ -13,4 +13,25 @@ if (!$isLoggedIn || $role != "admin") {
     exit();
 }
 
+$db = new db();
+$connection = $db->openConnection();
+$resultModel = new ResultModel();
+
+$statsResult = $resultModel->getAdminStats($connection);
+$stats = $statsResult->fetch_assoc();
+
+$categoriesResult = $resultModel->getTop5CategoriesByEndedAuctions($connection);
+$categories = [];
+while ($row = $categoriesResult->fetch_assoc()) {
+    $categories[] = $row;
+}
+
+echo json_encode([
+    "ok" => true,
+    "total_active" => $stats["total_active"],
+    "total_ended" => $stats["total_ended"],
+    "total_bids" => $stats["total_bids"],
+    "highest_sale" => $stats["highest_sale"],
+    "top_categories" => $categories
+]);
 ?>
