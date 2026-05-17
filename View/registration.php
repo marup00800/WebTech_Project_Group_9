@@ -22,7 +22,6 @@ unset($_SESSION["nameErr"]);
 unset($_SESSION["emailErr"]);
 unset($_SESSION["phoneErr"]);
 unset($_SESSION["passwordErr"]);
-unset($_SESSION["name"]);
 unset($_SESSION["email"]);
 unset($_SESSION["phone"]);
 unset($_SESSION["bio"]);
