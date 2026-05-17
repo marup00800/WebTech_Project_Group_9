@@ -164,29 +164,6 @@ $myBidsResult = $bidModel->getMyBids($connection, "bids", $user_id);
         }
         setInterval(countdown, 1000);
         countdown();
-
-        function placeBid() {
-            var amount = document.getElementById("bidAmount").value;
-            var listing_id = <?php echo $listing_id; ?>;
-            var xhttp = new XMLHttpRequest();
-            xhttp.onreadystatechange = function() {
-                if (this.readyState == 4 && this.status == 200) {
-                    var response = JSON.parse(this.responseText);
-                    if (response.ok) {
-                        document.getElementById("currentBid").innerHTML = response.new_bid;
-                        document.getElementById("bidError").innerHTML = "";
-                        var table = document.getElementById("bidHistoryTable");
-                        var newRow = table.insertRow(1);
-                        newRow.innerHTML = "<td><?php echo $name; ?></td><td>" + response.new_bid + "</td><td>Just now</td>";
-                    } else {
-                        document.getElementById("bidError").innerHTML = response.error;
-                    }
-                }
-            };
-            xhttp.open("POST", "../Controller/BidController.php", true);
-            xhttp.setRequestHeader("content-type", "application/x-www-form-urlencoded");
-            xhttp.send("listing_id=" + listing_id + "&amount=" + amount);
-        }
     </script>
 </body>
 </html>
