@@ -23,7 +23,6 @@ if (!$listing_id) {
 $db = new db();
 $connection = $db->openConnection();
 $resultModel = new ResultModel();
-
 $auctionModel = new AuctionModel();
 $bidModel = new BidModel();
 
