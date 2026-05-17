@@ -1,6 +1,7 @@
 <?php
 include "../Model/db.php";
 include "../Model/AuctionModel.php";
+include "../Model/ResultModel.php";
 session_start();
 
 $isLoggedIn = $_SESSION["isLoggedIn"] ?? false;
@@ -14,7 +15,6 @@ if (!$isLoggedIn) {
 $db = new db();
 $connection = $db->openConnection();
 $resultModel = new ResultModel();
-
 $auctionModel = new AuctionModel();
 $listings = $auctionModel->getActiveListings($connection, "listings");
 $categories = $auctionModel->getAllCategories($connection, "categories");
