@@ -34,6 +34,16 @@ class ResultModel {
         return $result;
     }
 
+    function getWinnerInfoByBidId($connection, $tableName, $bid_id) {
+        $sql = "SELECT b.*, u.name as winner_name, u.email as winner_email FROM $tableName b JOIN users u ON b.buyer_id = u.id WHERE b.id = ?";
+        $statement = $connection->prepare($sql);
+        $statement->bind_param("i", $bid_id);
+        $statement->execute();
+        $result = $statement->get_result();
+        return $result;
+    }
+
     
+
 }
 ?>
