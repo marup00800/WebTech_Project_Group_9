@@ -143,25 +143,7 @@ $myBidsResult = $bidModel->getMyBids($connection, "bids", $user_id);
         }
         ?>
     </table>
-
-    <script>
-        function countdown() {
-            var elements = document.querySelectorAll(".countdown");
-            elements.forEach(function(el) {
-                var endTime = new Date(el.getAttribute("data-end")).getTime();
-                var now = new Date().getTime();
-                var diff = endTime - now;
-                if (diff <= 0) {
-                    el.innerHTML = "Ended";
-                } else {
-                    var days = Math.floor(diff / (1000 * 60 * 60 * 24));
-                    var hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    var minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                    var seconds = Math.floor((diff % (1000 * 60)) / 1000);
-                    el.innerHTML = days + "d " + hours + "h " + minutes + "m " + seconds + "s";
-                }
-            });
-        }
+n
         setInterval(countdown, 1000);
         countdown();
     </script>
