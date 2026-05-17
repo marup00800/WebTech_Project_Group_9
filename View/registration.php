@@ -1,9 +1,34 @@
+<?php
+session_start();
 
+$nameError = $_SESSION["nameErr"] ?? "";
+$emailError = $_SESSION["emailErr"] ?? "";
+$phoneError = $_SESSION["phoneErr"] ?? "";
+$passwordError = $_SESSION["passwordErr"] ?? "";
+
+$name = $_SESSION["name"] ?? "";
+$email = $_SESSION["email"] ?? "";
+$phone = $_SESSION["phone"] ?? "";
+$bio = $_SESSION["bio"] ?? "";
+
+$isLoggedIn = $_SESSION["isLoggedIn"] ?? false;
+
+if ($isLoggedIn) {
+    Header("Location: dashboard.php");
+    exit();
+}
+
+unset($_SESSION["nameErr"]);
+unset($_SESSION["emailErr"]);
+unset($_SESSION["phoneErr"]);
+unset($_SESSION["passwordErr"]);
+unset($_SESSION["name"]);
+unset($_SESSION["email"]);
+unset($_SESSION["phone"]);
+unset($_SESSION["bio"]);
+?>
 <html>
 <head>
-    <title>Register</title>
-    <script src="../Controller/JS/checkEmail.js"></script>
-    <script src="../Controller/JS/checkUsername.js"></script>
 </head>
 <body>
     <h2>Register</h2>
