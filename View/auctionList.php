@@ -14,25 +14,8 @@ if (!$isLoggedIn) {
 
 $db = new db();
 $connection = $db->openConnection();
-$resultModel = new ResultModel();
-
-// close expired auctions
-$expiredListings = $resultModel->getExpiredActiveListings($connection, "listings");
-if ($expiredListings->num_rows > 0) {
-    while ($expiredRow = $expiredListings->fetch_assoc()) {
-        $expiredId = $expiredRow["id"];
-        $highestBidResult = $resultModel->getHighestBidByListing($connection, "bids", $expiredId);
-        if ($highestBidResult->num_rows > 0) {
-            $highestBidRow = $highestBidResult->fetch_assoc();
-            $resultModel->closeAuction($connection, "listings", $expiredId, $highestBidRow["id"]);
-        } else {
-            $resultModel->closeAuctionNoWinner($connection, "listings", $expiredId);
-        }
-    }
-}
 
 $auctionModel = new AuctionModel();
-$listings = $auctionModel->getActiveListings($connection, "listings");
 $categories = $auctionModel->getAllCategories($connection, "categories");
 ?>
 <html>
@@ -70,28 +53,6 @@ $categories = $auctionModel->getAllCategories($connection, "categories");
                 <th>Time Remaining</th>
                 <th>Action</th>
             </tr>
-            <?php
-            if ($listings->num_rows > 0) {
-                while ($row = $listings->fetch_assoc()) {
-                    $id = $row["id"];
-                    $title = $row["title"];
-                    $current_bid = $row["current_bid"];
-                    $bid_count = $row["bid_count"];
-                    $image_path = $row["image_path"];
-                    $end_datetime = $row["end_datetime"];
-                    echo "<tr>
-                        <td><img src='$image_path' height='50px' width='50px'/></td>
-                        <td>$title</td>
-                        <td>$current_bid</td>
-                        <td>$bid_count</td>
-                        <td><span class='countdown' data-end='$end_datetime'></span></td>
-                        <td><a href='bidNow.php?listing_id=$id'>Bid Now</a></td>
-                    </tr>";
-                }
-            } else {
-                echo "<tr><td colspan='6'>No active auctions found.</td></tr>";
-            }
-            ?>
         </table>
     </div>
 
