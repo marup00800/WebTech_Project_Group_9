@@ -25,6 +25,20 @@ $db = new db();
 $connection = $db->openConnection();
 $resultModel = new ResultModel();
 
+$expiredListings = $resultModel->getExpiredActiveListings($connection, "listings");
+if ($expiredListings->num_rows > 0) {
+    while ($expiredRow = $expiredListings->fetch_assoc()) {
+        $expiredId = $expiredRow["id"];
+        $highestBidResult = $resultModel->getHighestBidByListing($connection, "bids", $expiredId);
+        if ($highestBidResult->num_rows > 0) {
+            $highestBidRow = $highestBidResult->fetch_assoc();
+            $resultModel->closeAuction($connection, "listings", $expiredId, $highestBidRow["id"]);
+        } else {
+            $resultModel->closeAuctionNoWinner($connection, "listings", $expiredId);
+        }
+    }
+}
+
 $auctionModel = new AuctionModel();
 $bidModel = new BidModel();
 
@@ -143,9 +157,50 @@ $myBidsResult = $bidModel->getMyBids($connection, "bids", $user_id);
         }
         ?>
     </table>
-n
+
+    <script>
+        function countdown() {
+            var elements = document.querySelectorAll(".countdown");
+            elements.forEach(function(el) {
+                var endTime = new Date(el.getAttribute("data-end")).getTime();
+                var now = new Date().getTime();
+                var diff = endTime - now;
+                if (diff <= 0) {
+                    el.innerHTML = "Ended";
+                } else {
+                    var days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                    var hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    var minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                    var seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                    el.innerHTML = days + "d " + hours + "h " + minutes + "m " + seconds + "s";
+                }
+            });
+        }
         setInterval(countdown, 1000);
         countdown();
+
+        function placeBid() {
+            var amount = document.getElementById("bidAmount").value;
+            var listing_id = <?php echo $listing_id; ?>;
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    var response = JSON.parse(this.responseText);
+                    if (response.ok) {
+                        document.getElementById("currentBid").innerHTML = response.new_bid;
+                        document.getElementById("bidError").innerHTML = "";
+                        var table = document.getElementById("bidHistoryTable");
+                        var newRow = table.insertRow(1);
+                        newRow.innerHTML = "<td><?php echo $name; ?></td><td>" + response.new_bid + "</td><td>Just now</td>";
+                    } else {
+                        document.getElementById("bidError").innerHTML = response.error;
+                    }
+                }
+            };
+            xhttp.open("POST", "../Controller/BidController.php", true);
+            xhttp.setRequestHeader("content-type", "application/x-www-form-urlencoded");
+            xhttp.send("listing_id=" + listing_id + "&amount=" + amount);
+        }
     </script>
 </body>
 </html>
