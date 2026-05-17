@@ -14,10 +14,25 @@ if (!$isLoggedIn) {
 
 $db = new db();
 $connection = $db->openConnection();
+$resultModel = new ResultModel();
 
-
+// close expired auctions
+$expiredListings = $resultModel->getExpiredActiveListings($connection, "listings");
+if ($expiredListings->num_rows > 0) {
+    while ($expiredRow = $expiredListings->fetch_assoc()) {
+        $expiredId = $expiredRow["id"];
+        $highestBidResult = $resultModel->getHighestBidByListing($connection, "bids", $expiredId);
+        if ($highestBidResult->num_rows > 0) {
+            $highestBidRow = $highestBidResult->fetch_assoc();
+            $resultModel->closeAuction($connection, "listings", $expiredId, $highestBidRow["id"]);
+        } else {
+            $resultModel->closeAuctionNoWinner($connection, "listings", $expiredId);
+        }
+    }
+}
 
 $auctionModel = new AuctionModel();
+$listings = $auctionModel->getActiveListings($connection, "listings");
 $categories = $auctionModel->getAllCategories($connection, "categories");
 ?>
 <html>
@@ -55,8 +70,97 @@ $categories = $auctionModel->getAllCategories($connection, "categories");
                 <th>Time Remaining</th>
                 <th>Action</th>
             </tr>
-        
+            <?php
+            if ($listings->num_rows > 0) {
+                while ($row = $listings->fetch_assoc()) {
+                    $id = $row["id"];
+                    $title = $row["title"];
+                    $current_bid = $row["current_bid"];
+                    $bid_count = $row["bid_count"];
+                    $image_path = $row["image_path"];
+                    $end_datetime = $row["end_datetime"];
+                    echo "<tr>
+                        <td><img src='$image_path' height='50px' width='50px'/></td>
+                        <td>$title</td>
+                        <td>$current_bid</td>
+                        <td>$bid_count</td>
+                        <td><span class='countdown' data-end='$end_datetime'></span></td>
+                        <td><a href='bidNow.php?listing_id=$id'>Bid Now</a></td>
+                    </tr>";
+                }
+            } else {
+                echo "<tr><td colspan='6'>No active auctions found.</td></tr>";
+            }
+            ?>
         </table>
     </div>
+
+    <script>
+        function countdown() {
+            var elements = document.querySelectorAll(".countdown");
+            elements.forEach(function(el) {
+                var endTime = new Date(el.getAttribute("data-end")).getTime();
+                var now = new Date().getTime();
+                var diff = endTime - now;
+                if (diff <= 0) {
+                    el.innerHTML = "Ended";
+                } else {
+                    var days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                    var hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    var minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                    var seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                    el.innerHTML = days + "d " + hours + "h " + minutes + "m " + seconds + "s";
+                }
+            });
+        }
+        setInterval(countdown, 1000);
+        countdown();
+
+        function filterByCategory() {
+            var category_id = document.getElementById("categoryFilter").value;
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    var response = JSON.parse(this.responseText);
+                    var table = "<table border='1'><tr><th>Image</th><th>Title</th><th>Current Bid</th><th>Bid Count</th><th>Time Remaining</th><th>Action</th></tr>";
+                    if (response.listings.length > 0) {
+                        response.listings.forEach(function(listing) {
+                            table += "<tr><td><img src='" + listing.image_path + "' height='50px' width='50px'/></td><td>" + listing.title + "</td><td>" + listing.current_bid + "</td><td>" + listing.bid_count + "</td><td><span class='countdown' data-end='" + listing.end_datetime + "'></span></td><td><a href='bidNow.php?listing_id=" + listing.id + "'>Bid Now</a></td></tr>";
+                        });
+                    } else {
+                        table += "<tr><td colspan='6'>No active auctions found.</td></tr>";
+                    }
+                    table += "</table>";
+                    document.getElementById("listingsContainer").innerHTML = table;
+                    countdown();
+                }
+            };
+            xhttp.open("GET", "../Controller/AuctionController.php?action=filter&category_id=" + category_id, true);
+            xhttp.send();
+        }
+
+        function searchListings() {
+            var q = document.getElementById("searchInput").value;
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    var response = JSON.parse(this.responseText);
+                    var table = "<table border='1'><tr><th>Image</th><th>Title</th><th>Current Bid</th><th>Bid Count</th><th>Time Remaining</th><th>Action</th></tr>";
+                    if (response.listings.length > 0) {
+                        response.listings.forEach(function(listing) {
+                            table += "<tr><td><img src='" + listing.image_path + "' height='50px' width='50px'/></td><td>" + listing.title + "</td><td>" + listing.current_bid + "</td><td>" + listing.bid_count + "</td><td><span class='countdown' data-end='" + listing.end_datetime + "'></span></td><td><a href='bidNow.php?listing_id=" + listing.id + "'>Bid Now</a></td></tr>";
+                        });
+                    } else {
+                        table += "<tr><td colspan='6'>No results found.</td></tr>";
+                    }
+                    table += "</table>";
+                    document.getElementById("listingsContainer").innerHTML = table;
+                    countdown();
+                }
+            };
+            xhttp.open("GET", "../Controller/AuctionController.php?action=search&q=" + q, true);
+            xhttp.send();
+        }
+    </script>
 </body>
 </html>
