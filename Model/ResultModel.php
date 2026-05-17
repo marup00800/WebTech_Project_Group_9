@@ -43,7 +43,16 @@ class ResultModel {
         return $result;
     }
 
-    
+    function getAdminStats($connection) {
+        $sql = "SELECT 
+                    (SELECT COUNT(*) FROM listings WHERE status = 'active') as total_active,
+                    (SELECT COUNT(*) FROM listings WHERE status = 'ended') as total_ended,
+                    (SELECT COUNT(*) FROM bids) as total_bids,
+                    (SELECT MAX(amount) FROM bids) as highest_sale";
+        $result = $connection->query($sql);
+        return $result;
+    }
 
+    
 }
 ?>
