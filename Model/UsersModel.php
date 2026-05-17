@@ -24,5 +24,10 @@ class UsersModel {
         return $connection->query($sql);
     }
 
+    function checkExistingName($connection, $tableName, $name) {
+    $sql = "SELECT * FROM $tableName
+            WHERE name='$name'";
+    return $connection->query($sql);
 }
-?>
+
+}
