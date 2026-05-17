@@ -1,7 +1,6 @@
 <?php
 include "../Model/db.php";
 include "../Model/AuctionModel.php";
-include "../Model/ResultModel.php";
 session_start();
 
 $isLoggedIn = $_SESSION["isLoggedIn"] ?? false;
@@ -41,7 +40,6 @@ $categories = $auctionModel->getAllCategories($connection, "categories");
     </select>
 
     <input type="text" id="searchInput" placeholder="Search auctions..." onkeyup="searchListings()"/>
-    <p id="searchResponse"></p>
 
     <div id="listingsContainer">
         <table border="1" id="listingsTable">
