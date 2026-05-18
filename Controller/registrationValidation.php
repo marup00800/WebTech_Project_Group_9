@@ -59,11 +59,21 @@ if ($hasNameError || $hasEmailError || $hasPhoneError || $hasPasswordError) {
     $db = new db();
     $connection = $db->openConnection();
     $usersModel = new UsersModel();
-    $password_hash = password_hash($password, PASSWORD_DEFAULT);
-    $result = $usersModel->registerUser($connection, "users", $name, $email, $phone, $bio, $password_hash);
-    if ($result) {
-        Header("Location: ../View/login.php");
-    }
-    }
 
+    $existingUser = $usersModel->checkExistingEmail($connection, "users", $email);
+    if ($existingUser->num_rows > 0) {
+        $_SESSION["emailErr"] = "Email already registered. Please use another email.";
+        $_SESSION["name"] = $name;
+        $_SESSION["email"] = $email;
+        $_SESSION["phone"] = $phone;
+        $_SESSION["bio"] = $bio;
+        Header("Location: ../View/registration.php");
+    } else {
+        $password_hash = password_hash($password, PASSWORD_DEFAULT);
+        $result = $usersModel->registerUser($connection, "users", $name, $email, $phone, $bio, $password_hash);
+        if ($result) {
+            Header("Location: ../View/login.php");
+        }
+    }
+}
 ?>

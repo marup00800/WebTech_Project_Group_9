@@ -8,7 +8,7 @@ $email = $_SESSION["email"] ?? "";
 $isLoggedIn = $_SESSION["isLoggedIn"] ?? false;
 
 if ($isLoggedIn) {
-    Header("Location: dashboard.php");
+    Header("Location: auctionList.php");
     exit();
 }
 
@@ -17,7 +17,6 @@ unset($_SESSION["passwordErr"]);
 unset($_SESSION["loginErr"]);
 unset($_SESSION["email"]);
 ?>
-
 <html>
 <head>
     <title>Login</title>

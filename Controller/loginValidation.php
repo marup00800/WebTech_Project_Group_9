@@ -6,6 +6,9 @@ session_start();
 $email = $_POST["email"] ?? "";
 $password = $_POST["password"] ?? "";
 
+$hasEmailError = false;
+$hasPasswordError = false;
+
 if (!$email) {
     $_SESSION["emailErr"] = "Email is required";
     $hasEmailError = true;
@@ -30,7 +33,7 @@ if ($hasEmailError || $hasPasswordError) {
     $connection = $db->openConnection();
     $usersModel = new UsersModel();
 
-    $result = $usersModel->getUserByEmail($connection, "users", $email); 
+    $result = $usersModel->getUserByEmail($connection, "users", $email);
     if ($result->num_rows == 1) {
         while ($row = $result->fetch_assoc()) {
             if (password_verify($password, $row["password_hash"])) {
