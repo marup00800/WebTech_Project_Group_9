@@ -56,9 +56,7 @@ $categories = $auctionModel->getAllCategories($connection, "categories");
 </head>
 <body>
     <h2>Create Auction Listing</h2>
-    <a href="dashboard.php">Back to Dashboard</a> |
-    <a href="../Controller/logout.php">Logout</a>
-
+    <a href="dashboard.php">Back to Dashboard</a>
     <form method="post" action="../Controller/AuctionController.php" enctype="multipart/form-data">
         <table>
             <tr>

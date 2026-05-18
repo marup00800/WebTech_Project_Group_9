@@ -116,6 +116,7 @@ if ($hasTitleError || $hasDescriptionError || $hasCategoryError || $hasStartingP
     $_SESSION["reserve_price"] = $reserve_price;
     $_SESSION["end_datetime"] = $end_datetime;
     Header("Location: ../View/createAuction.php");
+    exit();
 } else {
     $uploadDirectory = "../uploads/";
     $fileName = time() . "_" . basename($file["name"]);
@@ -132,9 +133,11 @@ if ($hasTitleError || $hasDescriptionError || $hasCategoryError || $hasStartingP
     if ($result) {
         $_SESSION["auctionSuccess"] = "Auction listing created successfully.";
         Header("Location: ../View/dashboard.php");
+        exit();
     } else {
         $_SESSION["auctionErr"] = "Failed to create listing. Please try again.";
         Header("Location: ../View/createAuction.php");
+        exit();
     }
 }
 ?>
