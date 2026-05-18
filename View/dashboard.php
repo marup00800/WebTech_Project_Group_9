@@ -65,7 +65,10 @@ if ($role == "admin") {
 </head>
 <body>
     <h2>Hello, <?php echo $name; ?></h2>
-    <a href="../Controller/logout.php">Logout</a>
+    <a href="../Controller/logout.php">Logout</a> |
+    <a href="auctionList.php">Auction List</a> |
+    <a href="myBids.php">My Bids</a> |
+    <a href="auctionResult.php">Auction Results</a>
 
     <?php if ($auctionSuccess) { echo "<p style='color:green;'>$auctionSuccess</p>"; } ?>
     <?php if ($auctionErr) { echo "<p style='color:red;'>$auctionErr</p>"; } ?>

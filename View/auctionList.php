@@ -14,6 +14,7 @@ if (!$isLoggedIn) {
 
 $db = new db();
 $connection = $db->openConnection();
+
 $resultModel = new ResultModel();
 
 $expiredListings = $resultModel->getExpiredActiveListings($connection, "listings");
@@ -41,7 +42,7 @@ $categories = $auctionModel->getAllCategories($connection, "categories");
 <body>
     <h2>Hello, <?php echo $name; ?></h2>
     <a href="dashboard.php">Dashboard</a> |
-    <a href="bidNow.php">My Bids</a> |
+    <a href="myBids.php">My Bids</a>
     <a href="../Controller/logout.php">Logout</a>
 
     <h3>Active Auctions</h3>
