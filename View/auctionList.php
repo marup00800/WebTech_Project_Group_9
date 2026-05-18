@@ -14,7 +14,23 @@ if (!$isLoggedIn) {
 
 $db = new db();
 $connection = $db->openConnection();
+
 $resultModel = new ResultModel();
+
+$expiredListings = $resultModel->getExpiredActiveListings($connection, "listings");
+if ($expiredListings->num_rows > 0) {
+    while ($expiredRow = $expiredListings->fetch_assoc()) {
+        $expiredId = $expiredRow["id"];
+        $highestBidResult = $resultModel->getHighestBidByListing($connection, "bids", $expiredId);
+        if ($highestBidResult->num_rows > 0) {
+            $highestBidRow = $highestBidResult->fetch_assoc();
+            $resultModel->closeAuction($connection, "listings", $expiredId, $highestBidRow["id"]);
+        } else {
+            $resultModel->closeAuctionNoWinner($connection, "listings", $expiredId);
+        }
+    }
+}
+
 $auctionModel = new AuctionModel();
 $listings = $auctionModel->getActiveListings($connection, "listings");
 $categories = $auctionModel->getAllCategories($connection, "categories");
@@ -26,7 +42,7 @@ $categories = $auctionModel->getAllCategories($connection, "categories");
 <body>
     <h2>Hello, <?php echo $name; ?></h2>
     <a href="dashboard.php">Dashboard</a> |
-    <a href="bidNow.php">My Bids</a> |
+    <a href="myBids.php">My Bids</a>
     <a href="../Controller/logout.php">Logout</a>
 
     <h3>Active Auctions</h3>

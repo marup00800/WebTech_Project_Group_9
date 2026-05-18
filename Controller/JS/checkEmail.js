@@ -6,7 +6,7 @@ function checkEmail() {
       document.getElementById("emailCheckResponse").innerHTML = this.responseText;
     }
   };
-  xhttp.open("POST", "../Controller/HandleAjax.php", true);
+  xhttp.open("POST", "../Controller/checkEmail.php", true);
   xhttp.setRequestHeader("content-type", "application/x-www-form-urlencoded");
   xhttp.send("email=" + email);
 }

@@ -2,6 +2,7 @@
 include "../Model/db.php";
 include "../Model/AuctionModel.php";
 include "../Model/BidModel.php";
+include "../Model/ResultModel.php";
 session_start();
 
 $isLoggedIn = $_SESSION["isLoggedIn"] ?? false;
@@ -23,6 +24,21 @@ if (!$listing_id) {
 $db = new db();
 $connection = $db->openConnection();
 $resultModel = new ResultModel();
+
+$expiredListings = $resultModel->getExpiredActiveListings($connection, "listings");
+if ($expiredListings->num_rows > 0) {
+    while ($expiredRow = $expiredListings->fetch_assoc()) {
+        $expiredId = $expiredRow["id"];
+        $highestBidResult = $resultModel->getHighestBidByListing($connection, "bids", $expiredId);
+        if ($highestBidResult->num_rows > 0) {
+            $highestBidRow = $highestBidResult->fetch_assoc();
+            $resultModel->closeAuction($connection, "listings", $expiredId, $highestBidRow["id"]);
+        } else {
+            $resultModel->closeAuctionNoWinner($connection, "listings", $expiredId);
+        }
+    }
+}
+
 $auctionModel = new AuctionModel();
 $bidModel = new BidModel();
 
@@ -35,8 +51,8 @@ if ($listingResult->num_rows == 0) {
 
 $listing = $listingResult->fetch_assoc();
 $bidsResult = $bidModel->getLastTenBids($connection, "bids", $listing_id);
-
 $myBidsResult = $bidModel->getMyBids($connection, "bids", $user_id);
+
 ?>
 <html>
 <head>
@@ -187,4 +203,4 @@ $myBidsResult = $bidModel->getMyBids($connection, "bids", $user_id);
         }
     </script>
 </body>
-</html>
+</html> 
