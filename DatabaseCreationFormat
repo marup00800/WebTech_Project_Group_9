@@ -1,0 +1,73 @@
+-- Create Database
+CREATE DATABASE IF NOT EXISTS auction_db;
+USE auction_db;
+
+-- Users Table
+CREATE TABLE IF NOT EXISTS users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    role ENUM('buyer', 'admin') DEFAULT 'buyer',
+    seller_verified TINYINT(1) DEFAULT 0,
+    bio TEXT,
+    phone VARCHAR(20),
+    created_at DATETIME DEFAULT NOW()
+);
+
+-- Categories Table
+CREATE TABLE IF NOT EXISTS categories (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL
+);
+
+-- Listings Table
+CREATE TABLE IF NOT EXISTS listings (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    seller_id INT NOT NULL,
+    category_id INT NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    starting_price DECIMAL(10,2) NOT NULL,
+    reserve_price DECIMAL(10,2) DEFAULT NULL,
+    current_bid DECIMAL(10,2) NOT NULL,
+    image_path VARCHAR(255) DEFAULT NULL,
+    end_datetime DATETIME NOT NULL,
+    status ENUM('active', 'ended', 'cancelled') DEFAULT 'active',
+    winner_bid_id INT DEFAULT NULL,
+    created_at DATETIME DEFAULT NOW(),
+    FOREIGN KEY (seller_id) REFERENCES users(id),
+    FOREIGN KEY (category_id) REFERENCES categories(id)
+);
+
+-- Bids Table
+CREATE TABLE IF NOT EXISTS bids (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    listing_id INT NOT NULL,
+    buyer_id INT NOT NULL,
+    amount DECIMAL(10,2) NOT NULL,
+    created_at DATETIME DEFAULT NOW(),
+    FOREIGN KEY (listing_id) REFERENCES listings(id),
+    FOREIGN KEY (buyer_id) REFERENCES users(id)
+);
+
+-- Insert Default Admin User
+INSERT INTO users (name, email, password_hash, role, seller_verified, bio, phone, created_at)
+VALUES (
+    'Admin',
+    'admin@auction.com',
+    '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+    'admin',
+    1,
+    'System Administrator',
+    '01700000000',
+    NOW()
+);
+
+-- Insert Sample Categories
+INSERT INTO categories (name) VALUES
+('Electronics'),
+('Collectibles'),
+('Furniture'),
+('Clothing'),
+('Books');
