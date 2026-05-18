@@ -1,6 +1,8 @@
 <?php
 include "../Model/db.php";
 include "../Model/BidModel.php";
+include "../Model/ResultModel.php";
+
 session_start();
 
 header("Content-Type: application/json");
