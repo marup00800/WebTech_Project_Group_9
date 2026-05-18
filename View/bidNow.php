@@ -51,8 +51,8 @@ if ($listingResult->num_rows == 0) {
 
 $listing = $listingResult->fetch_assoc();
 $bidsResult = $bidModel->getLastTenBids($connection, "bids", $listing_id);
-
 $myBidsResult = $bidModel->getMyBids($connection, "bids", $user_id);
+
 ?>
 <html>
 <head>
